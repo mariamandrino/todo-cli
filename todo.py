@@ -30,8 +30,28 @@ class GestorTareas:
             estado = "hecha" if tarea["completada"] else "pendiente"
             print(f"{i + 1}.{estado} {tarea["nombre"]}")
 
+    def completar_tarea(self, numero):
+        if numero < 1 or numero > len(self.tareas):
+            print("Numero de tarea no valido")
+            return
+        self.tareas[numero - 1]["completada"] = True
+        self.guardar()
+        print(f"Tarea completada: {self.tareas[numero -1]["nombre"]}")
+
+    def eliminar_tarea(self, numero):
+        if numero < 1 or numero > len(self.tareas):
+            print("Número de tareas no válido")
+            return
+        tarea = self.tareas.pop(numero - 1)
+        self.guardar()
+        print(f"Tarea eliminada: {tarea["nombre"]}")
+
 
 gestor = GestorTareas()
 gestor.añadir_tarea("Aprender GIT")
 gestor.añadir_tarea("Terminar todo-cli")
+gestor.listar_tareas()
+gestor.completar_tarea(1)
+gestor.listar_tareas()
+gestor.eliminar_tarea(2)
 gestor.listar_tareas()
