@@ -1,5 +1,10 @@
 import json
 import os
+from rich.console import Console
+from rich.table import Table
+from rich import box
+
+console = Console()
 
 class GestorTareas:
     def __init__(self):
@@ -19,42 +24,51 @@ class GestorTareas:
     def añadir_tarea(self, nombre):
         self.tareas.append({"nombre": nombre, "completada": False})
         self.guardar()
-        print(f"Tarea guardada: {nombre}")
+        console.print(f"[green]✓ Tarea añadida: {nombre}[/green]")
 
     def listar_tareas(self):
         if not self.tareas:
-            print("No tienes tareas.")
+            console.print("[yellow]No tienes tareas todavía.[/yellow]")
             return
+        tabla = Table(box=box.ROUNDED, show_header=True, header_style="bold cyan")
+        tabla.add_column("Nº", style="dim", width=4)
+        tabla.add_column("Tarea", min_width=20)
+        tabla.add_column("Estado", width=10)
         for i, tarea in enumerate(self.tareas):
-            estado = "hecha" if tarea['completada'] else "pendiente"
-            print(f"{i + 1}. {estado} {tarea['nombre']}")
+            if tarea['completada']:
+                tabla.add_row(str(i + 1), f"[dim]{tarea['nombre']}[/dim]", "[green]hecha[/green]")
+            else:
+                tabla.add_row(str(i + 1), tarea['nombre'], "[yellow]pendiente[/yellow]")
+        console.print(tabla)
 
     def completar_tarea(self, numero):
         if numero < 1 or numero > len(self.tareas):
-            print("Numero de tarea no valido.")
+            console.print("[red]Numero de tarea no valido.[/red]")
             return
         self.tareas[numero - 1]['completada'] = True
         self.guardar()
-        print(f"Tarea completada: {self.tareas[numero - 1]['nombre']}")
+        console.print(f"[green]✓ Tarea completada: {self.tareas[numero - 1]['nombre']}[/green]")
 
     def eliminar_tarea(self, numero):
         if numero < 1 or numero > len(self.tareas):
-            print("Numero de tarea no valido.")
+            console.print("[red]Numero de tarea no valido.[/red]")
             return
         tarea = self.tareas.pop(numero - 1)
         self.guardar()
-        print(f"Tarea eliminada: {tarea['nombre']}")
+        console.print(f"[red]✗ Tarea eliminada: {tarea['nombre']}[/red]")
 
 def menu():
     gestor = GestorTareas()
     while True:
-        print("\n--- Todo CLI ---")
-        print("1. Ver tareas")
-        print("2. Añadir tarea")
-        print("3. Completar tarea")
-        print("4. Eliminar tarea")
-        print("5. Salir")
-        opcion = input("Elige una opcion: ")
+        console.print("\n[bold cyan]╔══════════════════════╗[/bold cyan]")
+        console.print("[bold cyan]║       Todo CLI       ║[/bold cyan]")
+        console.print("[bold cyan]╚══════════════════════╝[/bold cyan]")
+        console.print("  [cyan]1.[/cyan] Ver tareas")
+        console.print("  [cyan]2.[/cyan] Añadir tarea")
+        console.print("  [cyan]3.[/cyan] Completar tarea")
+        console.print("  [cyan]4.[/cyan] Eliminar tarea")
+        console.print("  [cyan]5.[/cyan] Salir")
+        opcion = input("\nElige una opcion: ")
         if opcion == "1":
             gestor.listar_tareas()
         elif opcion == "2":
@@ -71,9 +85,9 @@ def menu():
                 numero = int(input("Numero de tarea a eliminar: "))
                 gestor.eliminar_tarea(numero)
         elif opcion == "5":
-            print("Hasta luego.")
+            console.print("\n[bold cyan]Hasta luego![/bold cyan]\n")
             break
         else:
-            print("Opcion no valida.")
+            console.print("[red]Opcion no valida.[/red]")
 
 menu()
